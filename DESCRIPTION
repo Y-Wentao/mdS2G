@@ -1,0 +1,23 @@
+Package: mds2g
+Title: Multi-Dimensional SNP-to-GENE Strategy
+Version: 1.1.0
+Authors@R: 
+  person("Wentao", "Yao", email = "wentao.yao@foxmail.com", role = c("aut", "cre"))
+Description: This package aims to quickly implement the SNP to GENE work mentioned in our manuscript, 
+  which integrates multi-dimensional linking strategies and can be applied in various phenotype or disease related studies with good scalability.
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    AnnotationDbi (>= 1.64.0),
+    data.table (>= 1.17.6),
+    dplyr (>= 1.1.4),
+    magrittr,
+    org.Hs.eg.db (>= 3.18.0),
+    R.utils,
+    rlang,
+    stats,
+    stringr,
+    tidyr (>= 1.3.1),
+    utils
