@@ -224,7 +224,3 @@ If you use **mdS2G** in your research, please cite our manuscript:
 
 For any questions or issues, please contact:
 wentao.yao@foxmail.com
-
-```
-
-```
