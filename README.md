@@ -2,19 +2,19 @@
 
 ## Overview
 
-**mdS2G** is a R package designed to prioritize causal genes by integrating multiple lines of evidence:
+**mdS2G** is an R package designed to prioritize causal genes by integrating multiple lines of evidence:
 
 1.  **Locus-based linking** (based on cS2G)
 2.  **Similarity-based linking** (PoPS)
 3.  **Colocalization-based linking** (Coloc)
 
-This tool was developed for the paper *"Cross-ancestry GWAS of liver function-related biomarkers enhance insights into causal variants, credible genes, and therapeutic targets"*. It provides a robust pipeline for linking GWAS signals to their credible causal genes across different phenotypes. This package is  designed to run in a **Linux environment**.
+This tool was developed for the paper *"Cross-ancestry GWAS of liver function-related biomarkers enhance insights into causal variants, credible genes, and therapeutic targets"*. It provides a robust pipeline for linking GWAS signals to their credible causal genes across different phenotypes. This package is designed to run in a **Linux environment**.
 
 **Note:** Some external databases (e.g., cS2G annotations, eQTL summary statistics) are too large to be included in the package. Download links for these required resources are provided in the relevant sections below.
 
 ## System Requirements
 
-To ensure smooth execution, your system should meet the following requirements:
+Your system should meet the following requirements:
 
 * **R Version**: >= 4.3
 * **Package Dependencies**:
@@ -31,25 +31,31 @@ To ensure smooth execution, your system should meet the following requirements:
     * utils
 
 ## Installation
-
 You can install the development version of `mdS2G` from GitHub using the `devtools` package.
+
+### 1. Install Package & Create Workspace
+
+Run the following R code to install the package and create the required directory
 
 ```r
 if (!requireNamespace("devtools", quietly = TRUE))
     install.packages("devtools")
 
+# 1. Install mdS2G from GitHub
 devtools::install_github("Y-Wentao/mdS2G")
 
-# Create a directory for testing
-if (!dir.exists("mds2g_test")) {
-  dir.create("mds2g_test")
-}
-setwd("mds2g_test")
-
-# Load the library
-library(mds2g)
-
+# 2. Set up the workspace
+work_dir <- "mds2g_test"
+if (!dir.exists(work_dir)) dir.create(work_dir)
+setwd(work_dir)
+if (!dir.exists("input")) dir.create("input")
+if (!dir.exists("output")) dir.create("output")
 ```
+
+### 2. Download Example Data
+
+To run the demo, you need to download the file in the folder **example_data** (including fine-mapping results and GWAS summary statistics), and place them into the `mds2g_test/input/` directory** 
+
 
 ## Step-by-Step Usage Guide
 
@@ -66,10 +72,11 @@ For further details, please consult the associated manuscript and the original c
 **Prerequisite**: Download the cS2G annotation file (`S2G_bed.tgz`) from [Zenodo](https://zenodo.org/records/10117202) and unzip it.
 
 ```r
+library(mds2g)
 cs2g_link(
   pheno_name = c("ALT", "AST"),
-  SNP_data = "./input/fine_mapping_results.csv",  # Path to your fine-mapping file
-  s2g_folder = "/path/to/downloaded/S2G_bed/",    # Path to the unzipped S2G_bed folder
+  SNP_data = "./input/causal.csv",                # Uses the provided example fine-mapping file
+  s2g_folder = "/path/to/downloaded/S2G_bed/",    # Path to the unzipped S2G_bed folder (User must download)
   save_folder = "./output/",                      # Directory to save results
   keep_intermediate_file = TRUE,
   intermediate_file_folder = "./output/"
@@ -88,11 +95,10 @@ Process results from PoPS (Polygenic Priority Score).
 ```r
 pops_result_processing(
   pheno_name = c("ALT", "AST"),
-  SNP_data = "./input/fine_mapping_results.csv",  # Must match input from Step 1
-  pops_result_folder = "./input/pops_results/",   # Folder containing your .preds files
+  SNP_data = "./input/causal.csv",         # Must match input from Step 1
+  pops_result_folder = "./input/",         # Folder containing the example .preds files
   save_folder = "./output/"
 )
-
 ```
 
 **Output**: `*_pops_result_processed.csv` files.
@@ -108,7 +114,6 @@ nominated_gene_extract(
   pops_result_folder = "./output/",   # Result folder from Step 2
   save_folder = "./output/"
 )
-
 ```
 
 **Output**:
@@ -130,11 +135,10 @@ Clean and format cis-eQTL data (SMR format) for colocalization.
 
 ```r
 eqtl_data_preparation(
-  eqtl_data_folder = "/path/to/downloaded/eQTL_data/", # Folder with downloaded eQTL data
+  eqtl_data_folder = "/path/to/downloaded/eQTL_data/", # Path to downloaded eQTL data (User must download)
   smr_exe = "/path/to/software/smr",                   # Path to SMR executable file
   extract_gene_list = "./output/gene_for_coloc.txt"    # Generated in Step 3
 )
-
 ```
 
 **Output**: Separate folders for each tissue containing split eQTL data.
@@ -148,15 +152,14 @@ Format GWAS summary statistics for colocalization.
 gwas_data_preparation(
   pheno_name = c("ALT", "AST"),
   SNP_data_create_above = "./output/SNP_data_for_coloc.csv", # Generated in Step 3
-  gwas_data_folder = "./input/gwas_summary_stats/",          # Folder with your GWAS sumstats
-  gwas_data_suffix = ".txt.gz",
+  gwas_data_folder = "./input/",                             # Uses the provided example summary stats
+  gwas_data_suffix = ".txt.gz",                              # Matches the example files (ALT.txt.gz)
   gwas_allele_input = TRUE,
   gwas_data_type = "quant",       # "quant" or "cc"
   gwas_sdy_input = FALSE,         # Set TRUE if sdY is available
   gwas_beta_input = TRUE,         # Set TRUE if beta is available
   save_folder = "./output/gwas_prepared/"
 )
-
 ```
 
 **Output**: Folders for each phenotype containing locus-specific summary statistics.
@@ -170,15 +173,14 @@ eqtl_coloc(
   pheno_name = c("ALT", "AST"),
   SNP_data_create_above = "./output/SNP_data_for_coloc.csv",
   gwas_separate_data_folder = "./output/gwas_prepared/",
-  eqtl_separate_data_folder = "./output/eqtl_prepared/", # Output from Step 4
+  eqtl_separate_data_folder = "./output/eqtl_prepared/",   # Output from Step 4
   strand_harmonize = TRUE,
   gwas_data_type = "quant",
   gwas_sdy_input = FALSE,
   gwas_beta_input = TRUE,
-  gwas_n_data = "./input/gwas_samplesize.csv", # Required for quant traits without sdY.
+  gwas_n_data = "./input/gwas_samplesize.csv",             # Uses the provided example sample size file
   save_folder = "./output/coloc_results/"
 )
-
 ```
 
 **Output**:
@@ -197,7 +199,6 @@ result_process(
   cs2g_cred_data = "./output/cs2g_cred_gene.csv",
   save_folder = "./output/final_results/"
 )
-
 ```
 
 **Final Output Files**:
