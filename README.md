@@ -54,12 +54,12 @@ if (!dir.exists("output")) dir.create("output")
 
 ### 2. Download Example Data
 
-To run the demo, you need to download the file in the folder **example_data** (including fine-mapping results and GWAS summary statistics), and place them into the `mds2g_test/input/` directory** 
+To run the demo, you need to download the file in the folder **example_data** (including fine-mapping results and GWAS summary statistics), and place them into the `mds2g_test/input/` directory.
 
 
 ## Step-by-Step Usage Guide
 
-This demo uses **ALT** and **AST** (liver function traits) as example phenotypes to demonstrate the workflow.
+This demo uses **ALT** and **AST** (liver function quantitative traits) as example phenotypes to demonstrate the workflow.
 
 ### Step 1: Locus-based Linking (cS2G)
 
